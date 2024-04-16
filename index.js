@@ -7,7 +7,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001; 
 app.use(cors({
-  origin: ['https://llmdatavalidator.netlify.app'],
+  origin: ['https://llmdatavalidator.netlify.app', 'http://localhost:3000'],
 }));
 app.use(express.json()); 
 
