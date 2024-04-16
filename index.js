@@ -42,20 +42,22 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Error accessing user data', error: error.message });
   }
 });
-
-
 app.get('/uncorrected-annotations', async (req, res) => {
   try {
     const uncorrectedData = await db.collection("Predicted")
-    .find({
-      $or: [
-        { corrected: { $exists: false } }, 
-        { corrected: false }              
-      ]
-    })
-    .limit(10)
-    .toArray();
-  
+      .aggregate([
+        {
+          $match: {
+            $or: [
+              { corrected: { $exists: false } }, 
+              { corrected: false }
+            ]
+          }
+        },
+        { $sample: { size: 10 } }
+      ])
+      .toArray();
+    
     res.status(200).json(uncorrectedData);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching uncorrected data', error: error.message });
