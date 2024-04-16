@@ -1,17 +1,15 @@
-// Load environment variables from .env file
 import dotenv from 'dotenv';
 import express from 'express';
-import mongoclient from './Database/db.js'; // Ensure db.js exports using ES6 modules
+import mongoclient from './Database/db.js'; 
 import cors from 'cors';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001; // Fallback to 3001 if PORT isn't set
+const PORT = process.env.PORT || 3001; 
 app.use(cors())
-app.use(express.json()); // Use express.json middleware to parse JSON bodies
+app.use(express.json()); 
 
-// Get the database connection
-const db = mongoclient.db("Annotations"); // Adjust "Annotations" if your DB name is different
+const db = mongoclient.db("Annotations");
 
 app.post('/annotations', async (req, res) => {
   const data = req.body;
@@ -19,11 +17,7 @@ app.post('/annotations', async (req, res) => {
   const correctedCollection = db.collection("Corrected");
 
   try {
-    // Insert the corrected data into the 'Corrected' collection
     const correctedResult = await correctedCollection.insertOne(data);
-
-    // Update the 'corrected' field to 'true' in the 'Predicted' collection
-    // Use both `patient_id` and `prescription` to identify the record
     const predictedResult = await predictedCollection.updateOne(
       { patient_id: data.patient_id, prescription: data.prescription },
       { $set: { corrected: true } }
@@ -40,10 +34,8 @@ app.post('/login', async (req, res) => {
   try {
     const user = await db.collection('Users').findOne({ userName });
     if (user && user.password === password) {
-      // If password matches
       res.json({ success: true });
     } else {
-      // If no user is found or password does not match
       res.json({ success: false, message: 'Invalid credentials' });
     }
   } catch (error) {
